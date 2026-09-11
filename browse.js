@@ -6,29 +6,18 @@ function findWindow() {
 }
 
 function showOutline(target) {
-    const outline = document.createElement("div");
-    outline.id = "find-outline";
+    const outline = document.getElementById("find-outline");
+    const rect = target.getBoundingClientRect();
 
-    Object.assign(outline.style, {
-        position: "absolute",
-        inset: "-3px",
-        border: "2px solid yellow",
-        pointerEvents: "none",
-        zIndex: "2147483647",
-        borderRadius: "7px",
-        boxSizing: "border-box"
-    });
-
-    const position = getComputedStyle(target).position;
-    if (position === "static") {
-        target.style.position = "relative";
-    }
-
-    target.appendChild(outline);
+    outline.style.left = `${rect.left - 3}px`;
+    outline.style.top = `${rect.top - 3}px`;
+    outline.style.width = `${rect.width + 6}px`;
+    outline.style.height = `${rect.height + 6}px`;
+    outline.style.display = "";
 }
 
 function removeOutline() {
-    document.getElementById("find-outline")?.remove();
+    document.getElementById("find-outline").style.display = "none";
 }
 
 let lastElement = null
@@ -107,14 +96,9 @@ function findFocusableAncestor(node) {
 function isVisible(el) {
     if (!el) return false;
     const style = getComputedStyle(el);
-    if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse" || style.opacity === "0") return false;
+    if (style.display === "none" || style.visibility === "hidden" || style.opacity === "0") return false;
     const rect = el.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return false;
-    if (rect.bottom <= 0 || rect.right <= 0 || rect.top >= window.innerHeight || rect.left >= window.innerWidth) return false;
-    const x = Math.max(rect.left + 1, Math.min(rect.right - 1, window.innerWidth - 1));
-    const y = Math.max(rect.top + 1, Math.min(rect.bottom - 1, window.innerHeight - 1));
-    const hit = document.elementFromPoint(x, y);
-    if (!hit || !el.contains(hit)) return false;
     return true;
 }
 
@@ -174,3 +158,9 @@ function selectElementByText(search, preview) {
 
     return target;
 }
+
+window.addEventListener("scroll", () => {
+    if (lastElement !== null) {
+        showOutline(lastElement)
+    }
+}, true)

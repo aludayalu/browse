@@ -1,0 +1,1 @@
+import(chrome.runtime.getURL("main.js") + "?t=" + Date.now()).catch(console.error);

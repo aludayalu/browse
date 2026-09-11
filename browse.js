@@ -106,7 +106,6 @@ function selectElementByText(search, preview) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
-    const matches = [];
     const seen = new Set();
 
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
@@ -129,7 +128,6 @@ function selectElementByText(search, preview) {
 
         if (!seen.has(target)) {
             seen.add(target);
-            matches.push(target);
         }
     }
 
@@ -143,15 +141,14 @@ function selectElementByText(search, preview) {
 
         if (!seen.has(target)) {
             seen.add(target);
-            matches.push(target);
         }
     }
 
-    if (!matches.length) return;
+    if (!seen.size) return;
 
-    choice = Math.min(choice, matches.length - 1);
+    choice = Math.min(choice, seen.size - 1);
 
-    const target = matches[choice];
+    const target = Array.from(seen)[choice];
 
     target.scrollIntoView({ behavior: "smooth", block: "center" });
 

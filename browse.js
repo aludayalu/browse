@@ -94,18 +94,20 @@ function selectElementByText(search, preview) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
+    const matches = [];
+
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode(node) {
             const parentTag = node.parentElement?.tagName;
             if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
             if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+
             return node.nodeValue.toLowerCase().includes(lowerSearch)
                 ? NodeFilter.FILTER_ACCEPT
                 : NodeFilter.FILTER_SKIP;
         }
     });
 
-    const matches = [];
     let match;
 
     while ((match = walker.nextNode())) {
@@ -115,13 +117,24 @@ function selectElementByText(search, preview) {
         }
     }
 
+    for (const element of document.querySelectorAll("[aria-label]")) {
+        if (
+            isVisible(element) &&
+            element.getAttribute("aria-label").toLowerCase().includes(lowerSearch)
+        ) {
+            matches.push(element);
+        }
+    }
+
     if (!matches.length) return;
 
     choice = Math.min(choice, matches.length - 1);
 
     const selected = matches[choice];
 
-    let target = findFocusableAncestor(selected);
+    let target = selected.nodeType === Node.TEXT_NODE
+        ? findFocusableAncestor(selected)
+        : findFocusableAncestor(selected) || selected;
 
     if (!target) {
         target = selected.parentElement;

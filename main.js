@@ -2,8 +2,6 @@ const t = Date.now();
 const { insertHTML, simulateFullClick } = await import(`./utils.js?t=${t}`);
 const { SetupWindow, WindDown, setChoice, getChoice, WindowOnInput, clickSelection } = await import(`./browse.js?t=${t}`);
 
-console.log("[main.js] executing");
-
 async function getFile(file) {
     const url = chrome.runtime.getURL(file);
     const response = await fetch(url + "?t=" + String(new Date()));

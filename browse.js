@@ -45,9 +45,7 @@ export function WindowOnInput() {
 
     let target = selectElementByText(search);
 
-    if (lastElement !== null) {
-        removeOutline()
-    }
+    removeOutline()
 
     if (!target) {
         lastElement = null
@@ -73,8 +71,9 @@ export function WindDown() {
     findWindow().style.display = "none"
     findWindow().value = ""
 
+    removeOutline()
+
     if (lastElement !== null) {
-        removeOutline()
         lastElement.focus();
     }
 

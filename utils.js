@@ -2,7 +2,12 @@ export function insertHTML(html) {
     document.body.insertAdjacentHTML("afterend", html)
 }
 
-export function simulateFullClick(el) {
+export function simulateFullClick(el, newTab = false) {
+    if (newTab && el.tagName == "A") {
+        chrome.runtime.sendMessage({type: "open-tab", url: el.href});
+        return;
+    }
+    
     const rect = el.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;

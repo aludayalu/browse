@@ -5,6 +5,32 @@ function findWindow() {
     return document.getElementById("find-window")
 }
 
+function showOutline(target) {
+    const outline = document.createElement("div");
+    outline.id = "find-outline";
+
+    Object.assign(outline.style, {
+        position: "absolute",
+        inset: "-3px",
+        border: "2px solid yellow",
+        pointerEvents: "none",
+        zIndex: "2147483647",
+        borderRadius: "7px",
+        boxSizing: "border-box"
+    });
+
+    const position = getComputedStyle(target).position;
+    if (position === "static") {
+        target.style.position = "relative";
+    }
+
+    target.appendChild(outline);
+}
+
+function removeOutline() {
+    document.getElementById("find-outline")?.remove();
+}
+
 let lastElement = null
 let choice = 0
 export let search = ""
@@ -17,9 +43,9 @@ export function getChoice() {
     return choice
 }
 
-export function clickSelection() {
+export function clickSelection(newTab = false) {
     if (lastElement !== null) {
-        simulateFullClick(lastElement)
+        simulateFullClick(lastElement, newTab)
     }
 }
 
@@ -31,7 +57,7 @@ export function WindowOnInput() {
     let target = selectElementByText(search);
 
     if (lastElement !== null) {
-        lastElement.classList.remove("select-outline")
+        removeOutline()
     }
 
     if (!target) {
@@ -41,7 +67,7 @@ export function WindowOnInput() {
 
     lastElement = target
 
-    target.classList.add("select-outline")
+    showOutline(target)
 }
 
 export function SetupWindow() {
@@ -59,7 +85,7 @@ export function WindDown() {
     findWindow().value = ""
 
     if (lastElement !== null) {
-        lastElement.classList.remove("select-outline")
+        removeOutline()
         lastElement.focus();
     }
 
@@ -105,6 +131,7 @@ function selectElementByText(search, preview) {
 
     const lowerSearch = search.toLowerCase();
     const matches = [];
+    const seen = new Set();
 
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode(node) {
@@ -112,7 +139,7 @@ function selectElementByText(search, preview) {
             if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
             if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
-            return node.nodeValue.toLowerCase().includes(lowerSearch) ? NodeFilter.FILTER_ACCEPT: NodeFilter.FILTER_SKIP;
+            return node.nodeValue.toLowerCase().includes(lowerSearch) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
         }
     });
 
@@ -120,14 +147,28 @@ function selectElementByText(search, preview) {
 
     while ((match = walker.nextNode())) {
         const candidate = match.parentElement;
-        if (isVisible(candidate)) {
-            matches.push(match);
+        if (!isVisible(candidate)) continue;
+
+        const target = findFocusableAncestor(match) || candidate;
+
+        if (!seen.has(target)) {
+            seen.add(target);
+            matches.push(target);
         }
     }
 
     for (const element of document.querySelectorAll("[aria-label]")) {
-        if (isVisible(element) && element.getAttribute("aria-label").toLowerCase().includes(lowerSearch)) {
-            matches.push(element);
+        const ariaLabel = element.getAttribute("aria-label");
+
+        if (!ariaLabel) continue;
+        if (!isVisible(element)) continue;
+        if (!ariaLabel.toLowerCase().includes(lowerSearch)) continue;
+
+        const target = findFocusableAncestor(element) || element;
+
+        if (!seen.has(target)) {
+            seen.add(target);
+            matches.push(target);
         }
     }
 
@@ -135,13 +176,7 @@ function selectElementByText(search, preview) {
 
     choice = Math.min(choice, matches.length - 1);
 
-    const selected = matches[choice];
-
-    let target = selected.nodeType === Node.TEXT_NODE ? findFocusableAncestor(selected) : findFocusableAncestor(selected) || selected;
-
-    if (!target) {
-        target = selected.parentElement;
-    }
+    const target = matches[choice];
 
     target.scrollIntoView({ behavior: "smooth", block: "center" });
 

@@ -24,7 +24,7 @@ document.addEventListener("keydown", async (e) => {
 
     if (e.key == "Enter" && isFinding) {
         e.preventDefault();
-        clickSelection();
+        clickSelection(e.shiftKey || e.ctrlKey || e.metaKey);
         WindDown();
     }
 

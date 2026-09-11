@@ -11,7 +11,7 @@ async function getFile(file) {
 }
 
 document.addEventListener("keydown", async (e) => {
-    if (e.metaKey && e.shiftKey && e.key == "f") {
+    if ((e.ctrlKey || e.metaKey) && e.key == "f") {
         SetupWindow()
         e.preventDefault();
     }
@@ -28,23 +28,20 @@ document.addEventListener("keydown", async (e) => {
         WindDown();
     }
 
-    if (e.key == "ArrowUp" && isFinding) {
-        setChoice(getChoice() - 1)
+    if (e.key == "Tab" && isFinding) {
+        e.preventDefault();
+
+        if (e.shiftKey) {
+            setChoice(getChoice() - 1)
+        } else {
+            setChoice(getChoice() + 1)
+        }
 
         if (getChoice() <= 0) {
             setChoice(0)
         }
 
-        WindowOnInput()
-
-        e.preventDefault();
-    }
-
-    if (e.key == "ArrowDown" && isFinding) {
-        setChoice(getChoice() + 1)
-        e.preventDefault();
-
-        WindowOnInput()
+        WindowOnInput()        
     }
 })
 

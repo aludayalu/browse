@@ -18,7 +18,7 @@ document.addEventListener("keydown", async (e) => {
 
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement
 
-    if (e.key == "Escape" && isFinding) {
+    if (e.key == "Escape") {
         WindDown()
     }
 

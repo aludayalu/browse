@@ -66,31 +66,41 @@ export function WindDown() {
     choice = 0
 }
 
-let lastTaggedElement = null;
-
-function cleanupPreviousTag() {
-    if (lastTaggedElement) {
-        lastTaggedElement.removeAttribute("tabindex");
-        lastTaggedElement = null;
-    }
-}
-
 function findFocusableAncestor(node) {
-    const focusableSelector = "a[href], button, input, select, textarea, [tabindex]";
+    const focusableSelector = "a[href], button, input, select, textarea";
     let el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+
     while (el && el !== document.body) {
         if (el.matches(focusableSelector)) return el;
         el = el.parentElement;
     }
+
     return null;
 }
 
 function isVisible(el) {
-    return !!(el.offsetParent !== null || el.getClientRects().length);
+    if (!el) return false;
+
+    const style = getComputedStyle(el);
+
+    if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse" || style.opacity === "0") {
+        return false;
+    }
+
+    const rect = el.getBoundingClientRect();
+
+    if (rect.width <= 0 || rect.height <= 0) {
+        return false;
+    }
+
+    if (rect.bottom <= 0 || rect.right <= 0 || rect.top >= window.innerHeight || rect.left >= window.innerWidth) {
+        return false;
+    }
+
+    return true;
 }
 
 function selectElementByText(search, preview) {
-    cleanupPreviousTag();
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
@@ -102,9 +112,7 @@ function selectElementByText(search, preview) {
             if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
             if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
-            return node.nodeValue.toLowerCase().includes(lowerSearch)
-                ? NodeFilter.FILTER_ACCEPT
-                : NodeFilter.FILTER_SKIP;
+            return node.nodeValue.toLowerCase().includes(lowerSearch) ? NodeFilter.FILTER_ACCEPT: NodeFilter.FILTER_SKIP;
         }
     });
 
@@ -118,10 +126,7 @@ function selectElementByText(search, preview) {
     }
 
     for (const element of document.querySelectorAll("[aria-label]")) {
-        if (
-            isVisible(element) &&
-            element.getAttribute("aria-label").toLowerCase().includes(lowerSearch)
-        ) {
+        if (isVisible(element) && element.getAttribute("aria-label").toLowerCase().includes(lowerSearch)) {
             matches.push(element);
         }
     }
@@ -132,14 +137,10 @@ function selectElementByText(search, preview) {
 
     const selected = matches[choice];
 
-    let target = selected.nodeType === Node.TEXT_NODE
-        ? findFocusableAncestor(selected)
-        : findFocusableAncestor(selected) || selected;
+    let target = selected.nodeType === Node.TEXT_NODE ? findFocusableAncestor(selected) : findFocusableAncestor(selected) || selected;
 
     if (!target) {
         target = selected.parentElement;
-        target.setAttribute("tabindex", "-1");
-        lastTaggedElement = target;
     }
 
     target.scrollIntoView({ behavior: "smooth", block: "center" });

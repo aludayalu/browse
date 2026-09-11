@@ -136,9 +136,8 @@ function selectElementByText(search, preview) {
     for (const element of document.querySelectorAll("[aria-label]")) {
         const ariaLabel = element.getAttribute("aria-label");
 
-        if (!ariaLabel) continue;
+        if (!ariaLabel || !ariaLabel.toLowerCase().includes(lowerSearch)) continue;
         if (!isVisible(element)) continue;
-        if (!ariaLabel.toLowerCase().includes(lowerSearch)) continue;
 
         const target = findFocusableAncestor(element) || element;
 

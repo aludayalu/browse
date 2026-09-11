@@ -78,6 +78,7 @@ export function WindDown() {
     }
 
     choice = 0
+    lastElement = null
 }
 
 function findFocusableAncestor(node) {

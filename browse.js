@@ -88,12 +88,16 @@ export function clickSelection(newTab = false) {
     }
 }
 
-export function WindowOnInput() {
+let last_search = ""
+
+export function WindowOnInput(userChangedChoice = false) {    
     if (search == "") {
         choice = 0
     }
 
-    let target = selectElementByText(search);
+    let target = selectElementByText(search, search == last_search && userChangedChoice);
+
+    last_search = search
 
     removeOutline()
 
@@ -115,12 +119,17 @@ export function SetupWindow() {
         choice = 0
         WindowOnInput(e)
     }
+
+    last_search = ""
+    
     choice = 0
 }
 
 export function WindDown() {
     findWindow().style.display = "none"
     findWindow().value = ""
+
+    last_search = ""
 
     removeOutline()
 
@@ -153,7 +162,7 @@ function isVisible(el) {
     return true;
 }
 
-function selectElementByText(search, preview) {
+function selectElementByText(search, recalculateChoice) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
@@ -197,9 +206,15 @@ function selectElementByText(search, preview) {
 
     if (!seen.size) return;
 
+    let seen_array = Array.from(seen);
+
+    if (recalculateChoice && seen.has(lastElement)) {
+        choice = seen_array.indexOf(lastElement)
+    }
+
     choice = Math.min(choice, seen.size - 1);
 
-    const target = Array.from(seen)[choice];
+    const target = seen_array[choice];
 
     matches = seen;
 

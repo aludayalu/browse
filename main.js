@@ -55,7 +55,7 @@ document.addEventListener("keydown", async (e) => {
             setChoice(0)
         }
 
-        WindowOnInput()        
+        WindowOnInput(true)
     }
 })
 

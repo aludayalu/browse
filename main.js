@@ -1,6 +1,6 @@
 const t = Date.now();
 const { insertHTML, simulateFullClick } = await import(`./utils.js?t=${t}`);
-const { SetupWindow, WindDown, setChoice, getChoice, WindowOnInput, clickSelection } = await import(`./browse.js?t=${t}`);
+const { SetupWindow, WindDown, setChoice, getChoice, WindowOnInput, clickSelection, getMatchesSize } = await import(`./browse.js?t=${t}`);
 
 async function getFile(file) {
     const url = chrome.runtime.getURL(file);
@@ -35,7 +35,19 @@ document.addEventListener("keydown", async (e) => {
             setChoice(getChoice() + 1)
         }
 
-        if (getChoice() <= 0) {
+        if (getChoice() < 0) {
+            setChoice(getChoice() + getMatchesSize())
+        }
+
+        if (getChoice() >= getMatchesSize()) {
+            setChoice(getChoice() - getMatchesSize())
+        }
+
+        if (getChoice() < 0) {
+            setChoice(0)
+        }
+
+        if (getChoice() >= getMatchesSize()) {
             setChoice(0)
         }
 

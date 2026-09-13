@@ -5,19 +5,69 @@ function findWindow() {
     return document.getElementById("find-window")
 }
 
-function showOutline(target) {
-    const outline = document.getElementById("find-outline");
-    const rect = target.getBoundingClientRect();
+function findOutline() {
+    return document.getElementById("find-outline")
+}
 
-    outline.style.left = `${rect.left - 3}px`;
-    outline.style.top = `${rect.top - 3}px`;
-    outline.style.width = `${rect.width + 6}px`;
-    outline.style.height = `${rect.height + 6}px`;
-    outline.style.display = "";
+let matches = new Set();
+
+export function getMatchesSize() {
+    return matches.size
+}
+
+let positionCheckerAnimFrameID = null;
+
+function showOutline(target) {
+    const outline = findOutline();
+    
+    if (positionCheckerAnimFrameID) {
+        cancelAnimationFrame(positionCheckerAnimFrameID)
+        positionCheckerAnimFrameID = null;
+    }
+
+    let last_rect = {};
+
+    const updatePositionFrameLoop = () => {
+        if (!document.body.contains(target)) {
+            removeOutline();
+            WindowOnInput();
+            return;
+        }
+
+        const rect = target.getBoundingClientRect();
+
+        if (rect.top == last_rect.top && rect.height == last_rect.height && rect.width == last_rect.width && rect.left == last_rect.left) {
+            positionCheckerAnimFrameID = requestAnimationFrame(updatePositionFrameLoop)
+            return;
+        }
+
+        last_rect = rect;
+        
+        if (rect.width === 0 && rect.height === 0) {
+            removeOutline();
+            WindowOnInput();
+            return;
+        }
+
+        outline.style.left = `${rect.left - 3}px`;
+        outline.style.top = `${rect.top - 3}px`;
+        outline.style.width = `${rect.width + 6}px`;
+        outline.style.height = `${rect.height + 6}px`;
+        outline.style.display = "";
+
+        positionCheckerAnimFrameID = requestAnimationFrame(updatePositionFrameLoop)
+    };
+
+    updatePositionFrameLoop();
 }
 
 function removeOutline() {
-    document.getElementById("find-outline").style.display = "none";
+    findOutline().style.display = "none";
+    
+    if (positionCheckerAnimFrameID) {
+        cancelAnimationFrame(positionCheckerAnimFrameID)
+        positionCheckerAnimFrameID = null
+    }
 }
 
 let lastElement = null
@@ -150,13 +200,15 @@ function selectElementByText(search, preview) {
 
     const target = Array.from(seen)[choice];
 
+    matches = seen;
+
     target.scrollIntoView({ behavior: "smooth", block: "center" });
 
     return target;
 }
 
 window.addEventListener("scroll", () => {
-    if (lastElement !== null) {
-        showOutline(lastElement)
+    if (lastElement) {
+        WindowOnInput();
     }
-}, true)
+})

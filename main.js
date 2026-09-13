@@ -43,11 +43,15 @@ document.addEventListener("keydown", async (e) => {
             setChoice(getChoice() - getMatchesSize())
         }
 
-        if (getChoice() < 0) {
-            setChoice(0)
+        if (getChoice() >= getMatchesSize()) {
+            if (getMatchesSize() > 0) {
+                setChoice(getMatchesSize() - 1)
+            } else {
+                 setChoice(0)
+            }
         }
 
-        if (getChoice() >= getMatchesSize()) {
+        if (getChoice() < 0) {
             setChoice(0)
         }
 

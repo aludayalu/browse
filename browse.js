@@ -95,7 +95,7 @@ export function WindowOnInput(userChangedChoice = false) {
         choice = 0
     }
 
-    let target = selectElementByText(search, search == last_search && userChangedChoice);
+    let target = selectElementByText(search, search == last_search && !userChangedChoice);
 
     last_search = search
 

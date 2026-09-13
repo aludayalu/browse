@@ -112,6 +112,7 @@ export function SetupWindow() {
     findWindow().focus();
     findWindow().oninput = (e) => {
         search = e.target.value
+        choice = 0
         WindowOnInput(e)
     }
     choice = 0

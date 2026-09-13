@@ -90,12 +90,12 @@ export function clickSelection(newTab = false) {
 
 let last_search = ""
 
-export function WindowOnInput(userChangedChoice = false) {    
+export function WindowOnInput(userChangedChoice = false, toScroll = true) {    
     if (search == "") {
         choice = 0
     }
 
-    let target = selectElementByText(search, search == last_search && !userChangedChoice);
+    let target = selectElementByText(search, search == last_search && !userChangedChoice, toScroll);
 
     last_search = search
 
@@ -162,7 +162,7 @@ function isVisible(el) {
     return true;
 }
 
-function selectElementByText(search, recalculateChoice) {
+function selectElementByText(search, recalculateChoice, toScrollIntoView) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
@@ -218,13 +218,15 @@ function selectElementByText(search, recalculateChoice) {
 
     matches = seen;
 
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (toScrollIntoView) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
 
     return target;
 }
 
 window.addEventListener("scroll", () => {
     if (lastElement) {
-        WindowOnInput();
+        WindowOnInput(false, false);
     }
 })

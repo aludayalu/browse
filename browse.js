@@ -95,7 +95,7 @@ export function WindowOnInput(userChangedChoice = false, toScroll = true) {
         choice = 0
     }
 
-    let target = selectElementByText(search, search == last_search && !userChangedChoice, toScroll);
+    let target = selectElementByText(search, search == last_search && !userChangedChoice, toScroll, search !== last_search);
 
     last_search = search
 
@@ -153,6 +153,26 @@ function findFocusableAncestor(node) {
     return null;
 }
 
+function pickBestIndex(elements) {
+    let bestIdx = 0;
+    let bestScore = Infinity;
+    const vCenter = window.innerHeight / 2;
+
+    elements.forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        const inViewport = rect.bottom > 0 && rect.top < window.innerHeight;
+        const inNav = !!el.closest('nav, header, [role="navigation"], [role="banner"]');
+        const score = (inNav ? 1000 : 0) + (inViewport ? 0 : 100000) + Math.abs(rect.top + rect.height / 2 - vCenter);
+
+        if (score < bestScore) {
+            bestScore = score;
+            bestIdx = i;
+        }
+    });
+
+    return bestIdx;
+}
+
 function isVisible(el) {
     if (!el) return false;
     const style = getComputedStyle(el);
@@ -162,7 +182,7 @@ function isVisible(el) {
     return true;
 }
 
-function selectElementByText(search, recalculateChoice, toScrollIntoView) {
+function selectElementByText(search, recalculateChoice, toScrollIntoView, isFreshSearch) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
@@ -208,7 +228,9 @@ function selectElementByText(search, recalculateChoice, toScrollIntoView) {
 
     let seen_array = Array.from(seen);
 
-    if (recalculateChoice && seen.has(lastElement)) {
+    if (isFreshSearch) {
+        choice = pickBestIndex(seen_array);
+    } else if (recalculateChoice && seen.has(lastElement)) {
         choice = seen_array.indexOf(lastElement)
     }
 

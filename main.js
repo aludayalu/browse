@@ -22,18 +22,17 @@ async function KeyDown(e) {
         chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
         return
     }
-
-    if (e.key == "Escape") {
-        e.preventDefault();
-        WindDown()
-        e.stopPropagation();
-        return
-    }
     
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement
     
     if (isFinding) {
         e.stopPropagation();
+    }
+
+    if (e.key == "Escape") {
+        e.preventDefault();
+        WindDown()
+        return
     }
     
     if (e.key == "Enter" && isFinding) {

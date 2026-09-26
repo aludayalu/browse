@@ -1,3 +1,7 @@
+export function insertHTML(html) {
+    document.body.insertAdjacentHTML("afterend", html)
+}
+
 export function simulateFullClick(el, newTab = false) {
     if (newTab && el.tagName == "A") {
         chrome.runtime.sendMessage({type: "open-tab", url: el.href});

@@ -9,6 +9,11 @@ function findOutline() {
     return document.getElementById("find-outline")
 }
 
+function isInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+}
+
 let matches = new Set();
 
 export function getMatchesSize() {
@@ -153,24 +158,12 @@ function findFocusableAncestor(node) {
     return null;
 }
 
-function pickBestIndex(elements) {
-    let bestIdx = 0;
-    let bestScore = Infinity;
-    const vCenter = window.innerHeight / 2;
-
-    elements.forEach((el, i) => {
-        const rect = el.getBoundingClientRect();
-        const inViewport = rect.bottom > 0 && rect.top < window.innerHeight;
-        const inNav = !!el.closest('nav, header, [role="navigation"], [role="banner"]');
-        const score = (inNav ? 1000 : 0) + (inViewport ? 0 : 100000) + Math.abs(rect.top + rect.height / 2 - vCenter);
-
-        if (score < bestScore) {
-            bestScore = score;
-            bestIdx = i;
-        }
-    });
-
-    return bestIdx;
+function compareByTabOrder(a, b) {
+    const ra = a.getBoundingClientRect();
+    const rb = b.getBoundingClientRect();
+    const topDiff = (ra.top + window.scrollY) - (rb.top + window.scrollY);
+    if (topDiff !== 0) return topDiff;
+    return (ra.left + window.scrollX) - (rb.left + window.scrollX);
 }
 
 function isVisible(el) {
@@ -226,10 +219,14 @@ function selectElementByText(search, recalculateChoice, toScrollIntoView, isFres
 
     if (!seen.size) return;
 
-    let seen_array = Array.from(seen);
+    let seen_array = Array.from(seen).sort(compareByTabOrder);
 
     if (isFreshSearch) {
-        choice = pickBestIndex(seen_array);
+        choice = seen_array.findIndex(isInViewport);
+        
+        if (choice === -1) {
+            choice = 0
+        }
     } else if (recalculateChoice && seen.has(lastElement)) {
         choice = seen_array.indexOf(lastElement)
     }

@@ -27,12 +27,6 @@ async function KeyDown(e) {
         WindDown();
     }
     
-    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-
-        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
-    }
-    
     if (e.key == "Tab" && isFinding) {
         e.preventDefault();
     
@@ -67,6 +61,14 @@ async function KeyDown(e) {
 }
 
 document.addEventListener("keydown", KeyDown)
+
+document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+
+        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
+    }
+}, { capture: true })
 
 function findWindow() {
     return document.getElementById("find-window")

@@ -1,5 +1,5 @@
 const t = Date.now();
-const { insertHTML, simulateFullClick } = await import(`./utils.js?t=${t}`);
+const { fuzzyMatch, simulateFullClick } = await import(`./utils.js?t=${t}`);
 
 function findWindow() {
     return document.getElementById("find-window")
@@ -187,7 +187,7 @@ function selectElementByText(search, recalculateChoice, toScrollIntoView, isFres
             if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
             if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
-            return node.nodeValue.toLowerCase().includes(lowerSearch) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            return fuzzyMatch(node.nodeValue.toLowerCase(), lowerSearch) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
         }
     });
 
@@ -207,7 +207,7 @@ function selectElementByText(search, recalculateChoice, toScrollIntoView, isFres
     for (const element of document.querySelectorAll("[aria-label]")) {
         const ariaLabel = element.getAttribute("aria-label");
 
-        if (!ariaLabel || !ariaLabel.toLowerCase().includes(lowerSearch)) continue;
+        if (!ariaLabel || !fuzzyMatch(ariaLabel.toLowerCase(), lowerSearch)) continue;
         if (!isVisible(element)) continue;
 
         const target = findFocusableAncestor(element) || element;

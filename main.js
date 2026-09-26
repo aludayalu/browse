@@ -65,6 +65,7 @@ document.addEventListener("keydown", KeyDown)
 document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.preventDefault();
+        e.stopImmediatePropagation();
 
         chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
     }

@@ -12,13 +12,26 @@ async function KeyDown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key == "f") {
         SetupWindow()
         e.preventDefault();
+        e.stopPropagation();
+    }
+
+    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
+        return
+    }
+
+    if (e.key == "Escape") {
+        e.preventDefault();
+        WindDown()
     }
     
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement
     
-    if (e.key == "Escape") {
-        e.preventDefault();
-        WindDown()
+    if (isFinding) {
+        e.stopPropagation();
     }
     
     if (e.key == "Enter" && isFinding) {
@@ -60,16 +73,7 @@ async function KeyDown(e) {
     }
 }
 
-document.addEventListener("keydown", KeyDown)
-
-document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
-    }
-}, { capture: true })
+document.addEventListener("keydown", KeyDown, { capture: true })
 
 function findWindow() {
     return document.getElementById("find-window")

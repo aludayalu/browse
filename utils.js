@@ -20,34 +20,29 @@ export function simulateFullClick(el, newTab = false) {
     el.click();
 }
 
- export function fuzzyMatch(text, pattern, maxDistance = 2) {
-     const m = pattern.length;
-     if (m === 0) return true;
-     if (m > 30) return text.includes(pattern);
-
-     const mask = {};
-     for (let i = 0; i < m; i++) {
-         const ch = pattern[i];
-         mask[ch] = (mask[ch] | 0) | (1 << i);
+ export function fuzzyMatch(text, query) {   
+     if (text.length == query.length && text.length == 0) {
+         return false
      }
 
-     const R = new Array(maxDistance + 1);
-     for (let d = 0; d <= maxDistance; d++) R[d] = ~0;
+     if (text.length < query.length) {
+         return false
+     }
+
+     let found_all = false
+
+     let j = 0;
 
      for (let i = 0; i < text.length; i++) {
-         const cm = mask[text[i]] | 0;
+         if (query[j] == text[i]) {
+             j += 1
 
-         let prev = R[0];
-         R[0] = (R[0] << 1) & cm;
-
-         for (let d = 1; d <= maxDistance; d++) {
-             const old = R[d];
-             R[d] = ((R[d] << 1) & cm) | prev | (prev << 1) | 1;
-             prev = old;
+             if (j == query.length) {
+                 found_all = true
+                 break
+             }
          }
-
-         if (R[maxDistance] & (1 << (m - 1))) return true;
      }
 
-     return false;
+     return found_all
  }

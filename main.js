@@ -26,6 +26,8 @@ async function KeyDown(e) {
     if (e.key == "Escape") {
         e.preventDefault();
         WindDown()
+        e.stopPropagation();
+        return
     }
     
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement

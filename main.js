@@ -8,42 +8,48 @@ async function getFile(file) {
     return await response.text();
 }
 
-document.addEventListener("keydown", async (e) => {
+async function KeyDown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key == "f") {
         SetupWindow()
         e.preventDefault();
     }
-
+    
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement
-
+    
     if (e.key == "Escape") {
         e.preventDefault();
         WindDown()
     }
-
+    
     if (e.key == "Enter" && isFinding) {
         e.preventDefault();
         clickSelection(e.shiftKey || e.ctrlKey || e.metaKey);
         WindDown();
     }
-
-    if (e.key == "Tab" && isFinding) {
+    
+    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.preventDefault();
 
+        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
+    }
+    
+    if (e.key == "Tab" && isFinding) {
+        e.preventDefault();
+    
         if (e.shiftKey) {
             setChoice(getChoice() - 1)
         } else {
             setChoice(getChoice() + 1)
         }
-
+    
         if (getChoice() < 0) {
             setChoice(getChoice() + getMatchesSize())
         }
-
+    
         if (getChoice() >= getMatchesSize()) {
             setChoice(getChoice() - getMatchesSize())
         }
-
+    
         if (getChoice() >= getMatchesSize()) {
             if (getMatchesSize() > 0) {
                 setChoice(getMatchesSize() - 1)
@@ -51,14 +57,16 @@ document.addEventListener("keydown", async (e) => {
                  setChoice(0)
             }
         }
-
+    
         if (getChoice() < 0) {
             setChoice(0)
         }
-
+    
         WindowOnInput(true)
     }
-})
+}
+
+document.addEventListener("keydown", KeyDown)
 
 function findWindow() {
     return document.getElementById("find-window")

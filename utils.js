@@ -20,7 +20,10 @@ export function simulateFullClick(el, newTab = false) {
     el.click();
 }
 
- export function fuzzyMatch(text, query) {   
+ export function fuzzyMatch(text, query, max_gap = 3) {
+     text = text.toLowerCase();
+     query = query.toLowerCase();
+
      if (text.length == query.length && text.length == 0) {
          return false
      }
@@ -32,15 +35,23 @@ export function simulateFullClick(el, newTab = false) {
      let found_all = false
 
      let j = 0;
+     let highest_gap = 0;
+     let last_found_at_index = -1;
 
      for (let i = 0; i < text.length; i++) {
          if (query[j] == text[i]) {
              j += 1
 
+             if (last_found_at_index != -1 && i - last_found_at_index > max_gap) {
+                 return false
+             }
+
              if (j == query.length) {
                  found_all = true
                  break
              }
+
+             last_found_at_index = i;
          }
      }
 

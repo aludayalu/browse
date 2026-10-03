@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
     }
 })
 
-let last2Active = new Map()
+let lastActives = new Map()
 
 chrome.commands.onCommand.addListener(async (chrome_command) => {
     let [command, direction] = chrome_command.split("_")
@@ -63,7 +63,10 @@ chrome.commands.onCommand.addListener(async (chrome_command) => {
     }
 
     if (chrome_command == "switch_tabs") {
-        let other_tab_id = last2Active.get(activeTab.windowId)[0]
+        await CleanLastActiveTabs(activeTab.windowId)
+
+        let activeTabs = lastActives.get(activeTab.windowId)
+        let other_tab_id = activeTabs[activeTabs.length - 2]
 
         if (other_tab_id != -1 && tabs.findIndex(tab => tab.id == other_tab_id) != -1) {
             await chrome.tabs.update(other_tab_id, { active: true })
@@ -71,13 +74,34 @@ chrome.commands.onCommand.addListener(async (chrome_command) => {
     }
 })
 
-chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
-    if (!last2Active.has(windowId)) {
-        last2Active.set(windowId, [-1, -1])
+chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {
+    if (!lastActives.has(windowId)) {
+        lastActives.set(windowId, [])
     }
 
-    let ids = last2Active.get(windowId)
+    let ids = lastActives.get(windowId)
 
-    ids[0] = ids[1]
-    ids[1] = tabId
+    ids.push(tabId)
+
+    await CleanLastActiveTabs(windowId)
 })
+
+async function CleanLastActiveTabs(windowId) {
+    if (!lastActives.has(windowId)) return
+
+    let tabs = await chrome.tabs.query({ currentWindow: true })
+
+    let newTabIDs = []
+
+    let oldTabIDs = lastActives.get(windowId)
+
+    oldTabIDs.forEach((x) => {
+        if (tabs.findIndex((y) => y.id == x) == -1) {
+            return
+        }
+
+        newTabIDs.push(x)
+    })
+
+    lastActives.set(windowId, newTabIDs.slice(-100))
+}

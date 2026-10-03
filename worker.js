@@ -15,20 +15,6 @@ chrome.commands.onCommand.addListener(async (chrome_command) => {
 
     if (tabIndex == -1) return
 
-    if (command == "focus") {
-        if (direction == "left") {
-            if (tabIndex == 0) return
-
-            await chrome.tabs.update(tabs[tabIndex - 1].id, { active: true })
-        }
-
-        if (direction == "right") {
-            if (tabIndex == tabs.length - 1) return
-
-            await chrome.tabs.update(tabs[tabIndex + 1].id, { active: true })
-        }
-    }
-
     if (command == "move") {
         if (direction == "left") {
             if (tabIndex == 0) return

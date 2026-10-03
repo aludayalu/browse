@@ -19,14 +19,6 @@
         }
     ],
     "commands": {
-        "focus_left": {
-            "suggested_key": { "mac": "Command+Comma" },
-            "description": "Focus left tab"
-        },
-        "focus_right": {
-            "suggested_key": { "mac": "Command+Period" },
-            "description": "Focus right tab"
-        },
         "move_left": {
             "suggested_key": { "mac": "Command+Shift+Comma" },
             "description": "Move tab left"

@@ -66,11 +66,11 @@ chrome.commands.onCommand.addListener(async (chrome_command) => {
         }
 
         if (focus_direction == 0) {
-            await chrome.tabs.move(activeTab.id, {index: tabIndex - 1})
+            await chrome.tabs.update(tabs[tabIndex - 1].id, { active: true })
         }
 
         if (focus_direction == 1) {
-            await chrome.tabs.move(activeTab.id, {index: tabIndex + 1})
+            await chrome.tabs.update(tabs[tabIndex + 1].id, { active: true })
         }
 
         await chrome.tabs.remove(activeTab.id)

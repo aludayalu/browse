@@ -20,19 +20,19 @@
     ],
     "commands": {
         "focus_left": {
-            "suggested_key": { "mac": "MacCtrl+Left" },
+            "suggested_key": { "mac": "Command+Comma" },
             "description": "Focus left tab"
         },
         "focus_right": {
-            "suggested_key": { "mac": "MacCtrl+Right" },
+            "suggested_key": { "mac": "Command+Period" },
             "description": "Focus right tab"
         },
         "move_left": {
-            "suggested_key": { "mac": "MacCtrl+Shift+Left" },
+            "suggested_key": { "mac": "Command+Shift+Comma" },
             "description": "Move tab left"
         },
         "move_right": {
-            "suggested_key": { "mac": "MacCtrl+Shift+Right" },
+            "suggested_key": { "mac": "Command+Shift+Period" },
             "description": "Move tab right"
         },
         "new_tab": {
@@ -40,6 +40,9 @@
         },
         "close_tab": {
             "description": "Close Tab"
+        },
+        "switch_tabs": {
+            "description": "Switch Tabs"
         }
     }
 }

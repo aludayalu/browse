@@ -33,7 +33,7 @@ function showOutline(target) {
     let last_rect = {};
 
     const updatePositionFrameLoop = () => {
-        if (!document.body.contains(target)) {
+        if (!target.isConnected) {
             removeOutline();
             WindowOnInput();
             return;
@@ -175,45 +175,63 @@ function isVisible(el) {
     return true;
 }
 
+function collectRoots(root = document.body, roots = []) {
+    roots.push(root);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+    let el;
+    while ((el = walker.nextNode())) {
+        if (!(el instanceof HTMLElement)) {
+            continue
+        }
+
+        const shadow = el.shadowRoot || globalThis.chrome?.dom?.openOrClosedShadowRoot?.(el);
+
+        if (shadow) collectRoots(shadow, roots);
+    }
+    return roots;
+}
+
 function selectElementByText(search, recalculateChoice, toScrollIntoView, isFreshSearch) {
     if (!search.trim()) return;
 
     const lowerSearch = search.toLowerCase();
     const seen = new Set();
 
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-        acceptNode(node) {
-            const parentTag = node.parentElement?.tagName;
-            if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
-            if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+    for (const root of collectRoots()) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const parentTag = node.parentElement?.tagName;
+                if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
+                if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
 
-            return fuzzyMatch(node.nodeValue.toLowerCase(), lowerSearch) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+                return fuzzyMatch(node.nodeValue.toLowerCase(), lowerSearch) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            }
+        });
+
+        let match;
+
+        while ((match = walker.nextNode())) {
+            const candidate = match.parentElement;
+            if (!isVisible(candidate)) continue;
+
+            const target = findFocusableAncestor(match) || candidate;
+
+            if (!seen.has(target)) {
+                seen.add(target);
+            }
         }
-    });
 
-    let match;
+        for (const element of root.querySelectorAll("[aria-label]")) {
+            const ariaLabel = element.getAttribute("aria-label");
 
-    while ((match = walker.nextNode())) {
-        const candidate = match.parentElement;
-        if (!isVisible(candidate)) continue;
+            if (!ariaLabel || !fuzzyMatch(ariaLabel.toLowerCase(), lowerSearch)) continue;
+            if (!isVisible(element)) continue;
 
-        const target = findFocusableAncestor(match) || candidate;
+            const target = findFocusableAncestor(element) || element;
 
-        if (!seen.has(target)) {
-            seen.add(target);
-        }
-    }
-
-    for (const element of document.querySelectorAll("[aria-label]")) {
-        const ariaLabel = element.getAttribute("aria-label");
-
-        if (!ariaLabel || !fuzzyMatch(ariaLabel.toLowerCase(), lowerSearch)) continue;
-        if (!isVisible(element)) continue;
-
-        const target = findFocusableAncestor(element) || element;
-
-        if (!seen.has(target)) {
-            seen.add(target);
+            if (!seen.has(target)) {
+                seen.add(target);
+            }
         }
     }
 

@@ -28,8 +28,12 @@
         box-sizing: border-box;
         position: fixed;
         pointer-events: none;
-        border: 2px solid yellow;
+        padding: 3px;
         border-radius: 7px;
+        background: linear-gradient(135deg, #ff3d7f, #ff8a00, #a855f7);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
         z-index: 2147483646;
         display: none;
     "

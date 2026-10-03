@@ -73,3 +73,14 @@ function findWindow() {
 }
 
 insertHTML(await getFile("find.html"))
+
+const blockCmdDigits = (e) => {
+    if (!e.metaKey || e.ctrlKey || e.altKey) return
+    if (!/^Digit[0-9]$/.test(e.code)) return
+
+    e.stopImmediatePropagation()
+}
+
+window.addEventListener("keydown", blockCmdDigits, true)
+window.addEventListener("keyup", blockCmdDigits, true)
+window.addEventListener("keypress", blockCmdDigits, true)

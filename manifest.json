@@ -28,9 +28,11 @@
             "description": "Move tab right"
         },
         "new_tab": {
+            "suggested_key": { "mac": "Command+T" },
             "description": "New Tab"
         },
         "close_tab": {
+            "suggested_key": { "mac": "Command+W" },
             "description": "Close Tab"
         },
         "switch_tabs": {

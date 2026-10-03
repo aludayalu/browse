@@ -112,6 +112,10 @@ async function CleanLastActiveTabs(windowId) {
             return
         }
 
+        if (newTabIDs[newTabIDs.length - 1] == x) {
+            return
+        }
+
         newTabIDs.push(x)
     })
 

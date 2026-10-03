@@ -34,6 +34,12 @@
         "move_right": {
             "suggested_key": { "mac": "MacCtrl+Shift+Right" },
             "description": "Move tab right"
+        },
+        "new_tab": {
+            "description": "New Tab"
+        },
+        "close_tab": {
+            "description": "Close Tab"
         }
     }
 }

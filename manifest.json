@@ -37,6 +37,15 @@
         },
         "switch_tabs": {
             "description": "Switch Tabs"
-        }
+        },
+        "goto_tab_1": {"description": "Go to tab 1"},
+        "goto_tab_2": {"description": "Go to tab 2"},
+        "goto_tab_3": {"description": "Go to tab 3"},
+        "goto_tab_4": {"description": "Go to tab 4"},
+        "goto_tab_5": {"description": "Go to tab 5"},
+        "goto_tab_6": {"description": "Go to tab 6"},
+        "goto_tab_7": {"description": "Go to tab 7"},
+        "goto_tab_8": {"description": "Go to tab 8"},
+        "goto_tab_9": {"description": "Go to last tab"}
     }
 }

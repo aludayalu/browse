@@ -72,6 +72,18 @@ chrome.commands.onCommand.addListener(async (chrome_command) => {
             await chrome.tabs.update(other_tab_id, { active: true })
         }
     }
+
+    if (chrome_command.startsWith("goto_tab_")) {
+        if (!activeTab) return
+
+        const n = Number(chrome_command.slice("goto_tab_".length))
+        const tabs = await chrome.tabs.query({ windowId: activeTab.windowId })
+        const target = n === 9 ? tabs[tabs.length - 1] : tabs.find((t) => t.index === n - 1)
+
+        if (target) {
+            await chrome.tabs.update(target.id, { active: true })
+        }
+    }
 })
 
 chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {

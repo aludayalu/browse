@@ -1,0 +1,1 @@
+Turn off Move left a space and Move right a space in System Settings > Keyboard > Keyboard Shortcuts > Mission Control

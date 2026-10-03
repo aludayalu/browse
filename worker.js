@@ -5,9 +5,9 @@ chrome.runtime.onMessage.addListener(async (message) => {
 })
 
 chrome.commands.onCommand.addListener(async (command) => {
-    [command, direction] = command.split(".")
+    [command, direction] = command.split("_")
 
-    let tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    let tabs = await chrome.tabs.query({ currentWindow: true })
     let [ activeTab ] = await chrome.tabs.query({ active: true, currentWindow: true })
     let tabIndex = tabs.findIndex((tab) => tab.id == activeTab.id)
 

@@ -14,14 +14,6 @@ async function KeyDown(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-
-    if (e.ctrlKey && e.altKey && e.shiftKey && e.metaKey && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        chrome.runtime.sendMessage({type: "switch-tab", direction: e.key === "ArrowRight" ? "right" : "left"})
-        return
-    }
     
     let isFinding = (findWindow().style.display == "" || findWindow().style.display == "initial") && findWindow() == document.activeElement
     
@@ -62,7 +54,7 @@ async function KeyDown(e) {
             if (getMatchesSize() > 0) {
                 setChoice(getMatchesSize() - 1)
             } else {
-                 setChoice(0)
+                setChoice(0)
             }
         }
     

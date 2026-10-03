@@ -17,5 +17,23 @@
             "resources": ["*"],
             "matches": ["<all_urls>"]
         }
-    ]
+    ],
+    "commands": {
+        "focus.left": {
+            "suggested_key": { "mac": "MacCtrl+Alt+Left" },
+            "description": "Focus left tab"
+        },
+        "focus.right": {
+            "suggested_key": { "mac": "MacCtrl+Alt+Right" },
+            "description": "Focus right tab"
+        },
+        "move.left": {
+            "suggested_key": { "mac": "MacCtrl+Alt+Shift+Left" },
+            "description": "Move tab left"
+        },
+        "move.right": {
+            "suggested_key": { "mac": "MacCtrl+Alt+Shift+Right" },
+            "description": "Move tab right"
+        }
+    }
 }
